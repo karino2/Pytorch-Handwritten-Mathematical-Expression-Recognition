@@ -130,10 +130,13 @@ test_loader = torch.utils.data.DataLoader(
 
 #encoder = DenseNet121().cuda()
 #encoder = resnet101().cuda()
-encoder = densenet121().cuda()
-attn_decoder1 = AttnDecoderRNN(hidden_size,112,dropout_p=0.1).cuda()
-encoder.load_state_dict(torch.load('model/encoder_lr0.00009_nopadding_pre_GN_te05_d02_f.pkl'))
-attn_decoder1.load_state_dict(torch.load('model/attn_decoder_lr0.00009_nopadding_pre_GN_te05_d02_f.pkl'))
+device = torch.device('cpu')
+cpu_mapper = lambda storage, loc: device
+
+encoder = densenet121()
+attn_decoder1 = AttnDecoderRNN(hidden_size,112,dropout_p=0.1)
+encoder.load_state_dict(torch.load('model/encoder_lr0.00009_nopadding_pre_GN_te05_d02_f.pkl', map_location='cpu'))
+attn_decoder1.load_state_dict(torch.load('model/attn_decoder_lr0.00009_nopadding_pre_GN_te05_d02_f.pkl', map_location='cpu'))
 
 total_dist = 0
 total_label = 0
@@ -156,11 +159,11 @@ attn_decoder1.eval()
 for step_t, (x_t, y_t) in enumerate(test_loader):
     cnn_out=[]
     cnn_out1=[]
-    x_t = Variable(x_t.cuda())
+    x_t = Variable(x_t)
     x_real_high = x_t.size()[2]
     x_real_width = x_t.size()[3]
     x_real = x_t.view(x_real_high,x_real_width)
-    y_t = Variable(y_t.cuda())
+    y_t = Variable(y_t)
     out_t = encoder(x_t)
     #out_1_conv = out_1_conv.squeeze(0)
     output_highfeature_t = out_t.squeeze(0)
@@ -172,7 +175,7 @@ for step_t, (x_t, y_t) in enumerate(test_loader):
     target_length_t = y_t.size()[1]
 
     decoder_input_t = Variable(torch.LongTensor([[111]]))
-    decoder_input_t = decoder_input_t.cuda()
+    decoder_input_t = decoder_input_t
     decoder_hidden_t = attn_decoder1.initHidden()
     decoder_hidden_t = decoder_hidden_t * x_mean_t
     decoder_hidden_t = torch.tanh(decoder_hidden_t)
@@ -180,8 +183,8 @@ for step_t, (x_t, y_t) in enumerate(test_loader):
     prediction = []
     label = []
     decoder_attention_t_cat = []
-    decoder_attention_t = Variable(torch.zeros(1, dense_input, output_area_t).cuda())
-    attention_sum_t = Variable(torch.zeros(1, dense_input, output_area_t).cuda())
+    decoder_attention_t = Variable(torch.zeros(1, dense_input, output_area_t))
+    attention_sum_t = Variable(torch.zeros(1, dense_input, output_area_t))
     for i in range(maxlen+1+1):
         decoder_output, decoder_hidden_t, decoder_attention_t, attention_sum_t = attn_decoder1(decoder_input_t,
                                                                                                decoder_hidden_t,

@@ -99,5 +99,5 @@ class AttnDecoderRNN(nn.Module):
 
     def initHidden(self):
         result = Variable(torch.randn(1, 1, self.hidden_size))
-        return result.cuda()
+        return result
 

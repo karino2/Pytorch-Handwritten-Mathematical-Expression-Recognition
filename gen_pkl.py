@@ -10,7 +10,8 @@ import pickle as pkl
 import numpy
 from scipy.misc import imread, imresize, imsave
 
-image_path='C:\\Users\\msraspeech\\PycharmProjects\\v-honwa\\off_image_test\\off_image_test\\'
+# image_path='C:\\Users\\msraspeech\\PycharmProjects\\v-honwa\\off_image_test\\off_image_test\\'
+image_path='/work/Pytorch-Handwritten-Mathematical-Expression-Recognition/off_image_test/'
 outFile='offline-test.pkl'
 oupFp_feature=open(outFile,'wb')
 
@@ -20,7 +21,8 @@ channels=1
 
 sentNum=0
 
-scpFile=open('C:\\Users\\msraspeech\\PycharmProjects\\v-honwa\\test_caption.txt')
+# scpFile=open('C:\\Users\\msraspeech\\PycharmProjects\\v-honwa\\test_caption.txt')
+scpFile=open('/work/Pytorch-Handwritten-Mathematical-Expression-Recognition/test_caption.txt')
 while 1:
     line=scpFile.readline().strip() # remove the '\r\n'
     if not line:
